@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>💌 Hand Tracking Magic - a message for you</title>
+    <title>💌 Hand Tracking Magic - Smart Gesture</title>
     <style>
         * {
             margin: 0;
@@ -192,7 +192,7 @@
             bottom: 20px;
             left: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 12px;
@@ -222,6 +222,13 @@
         .camera-overlay .gesture-status {
             font-weight: bold;
             color: #ff99bb;
+            font-size: 11px;
+        }
+
+        .camera-overlay .finger-info {
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 4px;
         }
 
         .camera-overlay .close-cam {
@@ -238,15 +245,24 @@
             position: fixed;
             bottom: 100px;
             right: 20px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            padding: 8px 15px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            padding: 12px 18px;
             border-radius: 30px;
             color: white;
             font-size: 11px;
             z-index: 100;
             pointer-events: none;
             font-family: monospace;
+            text-align: center;
+            max-width: 220px;
+            border: 1px solid #ff99bb;
+            transition: all 0.2s ease;
+        }
+
+        .gesture-hint .highlight {
+            color: #ff99bb;
+            font-weight: bold;
         }
 
         .card {
@@ -256,7 +272,7 @@
             border-radius: 48px;
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-            transition: transform 0.1s ease-out, scale 0.1s ease-out;
+            transition: transform 0.05s ease-out, scale 0.05s ease-out;
             transform-origin: center center;
         }
 
@@ -382,6 +398,7 @@
             padding: 24px;
             margin: 16px 0 20px;
             border: 1px solid #ffe2e9;
+            transition: transform 0.1s ease-out;
         }
 
         .confession-text {
@@ -415,6 +432,7 @@
             object-fit: cover;
             border-radius: 22px;
             display: block;
+            transition: transform 0.1s ease-out;
         }
 
         footer {
@@ -439,33 +457,39 @@
         .foto-item:nth-child(3) { animation-delay: 1s; }
         .foto-item:nth-child(4) { animation-delay: 1.5s; }
 
-        .loading-overlay {
+        @keyframes fistPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255,51,102,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); }
+        }
+
+        .fist-effect {
+            animation: fistPulse 0.5s ease-out;
+        }
+
+        /* Info bubble untuk zoom */
+        .zoom-info {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
             color: white;
-            gap: 20px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 200;
+            pointer-events: none;
+            white-space: nowrap;
+            border: 2px solid #ff99bb;
+            animation: zoomInfoFade 0.8s ease-out forwards;
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #ff99bb;
-            border-top-color: #ff3366;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes zoomInfoFade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(1.2); }
         }
     </style>
 </head>
@@ -513,13 +537,13 @@
         </div>
 
         <div class="content">
-            <div class="confession-box">
+            <div class="confession-box" id="confessionBox">
                 <div class="confession-text">
                     haiii  my personn , i want to confess u something , i made this this long message to confess my feelings for you idk how i fell right now , i just wanna express to u and i want to clear things with you . yes i like you for a very long time eer , shshssh sound cringe right ? i know you like someone else and there's so many people better than me but i just want to you know that i like youuuuu . i respect your fellings if you dont like me , i don't have permission to force you to like me back , but i wish you like me back HAHAHAH . this is not just a small crush ~~ its the way you make me feel comfortable to talk with . i know it maybe a surprise to you , and i understand it you don't feel the same way . but i couldn't go on keeping this yo myself any longer . i had to tell you what i feel , even though we haven't known each other for a long time . okay that's all babaii see you again the person i like
                 </div>
             </div>
 
-            <div class="foto-grid">
+            <div class="foto-grid" id="fotoGrid">
                 <div class="foto-item"><img class="foto-grid-img" src="https://img2.pixhost.to/images/7162/714785661_alip-1776132191251.jpg" alt="" onerror="this.src='https://placehold.co/200x200/FFD1DC/white?text=📸'"></div>
                 <div class="foto-item"><img class="foto-grid-img" src="https://img2.pixhost.to/images/7162/714785681_alip-1776132212076.jpg" alt="" onerror="this.src='https://placehold.co/200x200/FFC0CB/white?text=📸'"></div>
                 <div class="foto-item"><img class="foto-grid-img" src="https://img2.pixhost.to/images/7162/714785704_alip-1776132224026.jpg" alt="" onerror="this.src='https://placehold.co/200x200/FFB6C1/white?text=📸'"></div>
@@ -530,7 +554,12 @@
     </div>
 </div>
 
-<div class="gesture-hint" id="gestureHint">✋ Tunjukkan telapak tangan ke kamera</div>
+<div class="gesture-hint" id="gestureHint">
+    🖐️ <span class="highlight">Tunjukkan telapak tangan</span> ke kamera<br>
+    🤏 <span class="highlight">Jepit jari</span> = Zoom In/Out<br>
+    ✊ <span class="highlight">Kepal tangan</span> = Semua menyusut!<br>
+    🖐️ <span class="highlight">Geser tangan</span> = Putar 3D
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
@@ -550,6 +579,43 @@
             love.style.zIndex = '9999';
             document.body.appendChild(love);
             setTimeout(() => love.remove(), 1000);
+        }
+
+        function createShrinkEffect() {
+            const card = document.getElementById('mainCard');
+            if (card) {
+                card.classList.add('fist-effect');
+                setTimeout(() => card.classList.remove('fist-effect'), 500);
+            }
+            createLoveEffect(window.innerWidth/2, window.innerHeight/2);
+        }
+
+        // ========== INFO ZOOM BUBBLE ==========
+        function showZoomInfo(percent, isZoomIn) {
+            const info = document.createElement('div');
+            info.className = 'zoom-info';
+            const icon = isZoomIn ? '🔍➕' : '🔍➖';
+            info.innerHTML = `${icon} Zoom ${isZoomIn ? 'In' : 'Out'} ${Math.round(percent)}%`;
+            document.body.appendChild(info);
+            setTimeout(() => info.remove(), 800);
+        }
+
+        function showFistInfo() {
+            const info = document.createElement('div');
+            info.className = 'zoom-info';
+            info.innerHTML = '✊💥 SEMUA MENYUSUT! 💥✊';
+            info.style.background = 'rgba(255,51,102,0.9)';
+            document.body.appendChild(info);
+            setTimeout(() => info.remove(), 800);
+        }
+
+        function showGestureInfo(message, icon = '✋') {
+            const info = document.createElement('div');
+            info.className = 'zoom-info';
+            info.innerHTML = `${icon} ${message}`;
+            info.style.background = 'rgba(0,0,0,0.8)';
+            document.body.appendChild(info);
+            setTimeout(() => info.remove(), 600);
         }
 
         // ========== LAGU ==========
@@ -623,8 +689,6 @@
             introAudio.pause();
             if (mainAudio) mainAudio.play().catch(e => console.log("Auto-play need interaction"));
             if (e.clientX) createLoveEffect(e.clientX, e.clientY);
-            
-            // Mulai kamera setelah user klik
             startCamera();
         });
         
@@ -750,9 +814,13 @@
         
         loadSong(0);
         
-        // ========== HAND TRACKING & ZOOM ==========
+        // ========== HAND TRACKING with BETTER FEEDBACK ==========
         const card = document.getElementById('mainCard');
         const fotoUtama = document.getElementById('fotoUtama');
+        const confessionBox = document.getElementById('confessionBox');
+        const fotoItems = document.querySelectorAll('.foto-item');
+        const fotoGridImgs = document.querySelectorAll('.foto-grid-img');
+        
         let currentScale = 1;
         let currentRotateX = 0;
         let currentRotateY = 0;
@@ -760,19 +828,48 @@
         let targetRotateX = 0;
         let targetRotateY = 0;
         
-        // Variabel untuk hand tracking
-        let lastHandPosition = null;
+        let lastFistState = false;
+        let fistStartTime = 0;
+        let isFistDetected = false;
         let lastDistance = null;
         let isHandDetected = false;
         let gestureHint = document.getElementById('gestureHint');
         
-        // Camera overlay elements
         let videoElement = null;
         let camera = null;
         let hands = null;
         
+        let lastZoomPercent = 100;
+        let lastZoomTime = 0;
+        
+        function isFist(landmarks) {
+            let foldedFingers = 0;
+            if (landmarks[8].y > landmarks[6].y) foldedFingers++;
+            if (landmarks[12].y > landmarks[10].y) foldedFingers++;
+            if (landmarks[16].y > landmarks[14].y) foldedFingers++;
+            if (landmarks[20].y > landmarks[18].y) foldedFingers++;
+            const thumbOpen = Math.abs(landmarks[4].x - landmarks[2].x) > 0.08;
+            return foldedFingers >= 3 && !thumbOpen;
+        }
+        
+        function getFingerStatus(landmarks) {
+            const indexOpen = landmarks[8].y < landmarks[6].y;
+            const middleOpen = landmarks[12].y < landmarks[10].y;
+            const ringOpen = landmarks[16].y < landmarks[14].y;
+            const pinkyOpen = landmarks[20].y < landmarks[18].y;
+            const thumbOpen = Math.abs(landmarks[4].x - landmarks[2].x) > 0.08;
+            
+            let openCount = 0;
+            if (indexOpen) openCount++;
+            if (middleOpen) openCount++;
+            if (ringOpen) openCount++;
+            if (pinkyOpen) openCount++;
+            if (thumbOpen) openCount++;
+            
+            return { openCount, indexOpen, middleOpen, ringOpen, pinkyOpen, thumbOpen };
+        }
+        
         function startCamera() {
-            // Buat overlay kamera
             const overlay = document.createElement('div');
             overlay.className = 'camera-overlay';
             overlay.id = 'cameraOverlay';
@@ -780,7 +877,8 @@
                 <video id="handVideo" autoplay muted playsinline></video>
                 <div class="info">
                     <div>🖐️ Hand Tracking Active</div>
-                    <div class="gesture-status" id="gestureStatus">Menunggu tangan...</div>
+                    <div class="gesture-status" id="gestureStatus">👋 Menunggu tangan...</div>
+                    <div class="finger-info" id="fingerInfo">✋ Tunjukkan tangan ke kamera</div>
                 </div>
                 <button class="close-cam" id="closeCamBtn">✖ Tutup</button>
             `;
@@ -788,11 +886,8 @@
             
             videoElement = document.getElementById('handVideo');
             
-            // Inisialisasi MediaPipe Hands
             hands = new Hands({
-                locateFile: (file) => {
-                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                }
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
             });
             
             hands.setOptions({
@@ -804,11 +899,8 @@
             
             hands.onResults(onHandResults);
             
-            // Mulai camera
             const cameraObj = new Camera(videoElement, {
-                onFrame: async () => {
-                    await hands.send({image: videoElement});
-                },
+                onFrame: async () => await hands.send({image: videoElement}),
                 width: 320,
                 height: 240
             });
@@ -818,7 +910,7 @@
                 cameraObj.stop();
                 overlay.remove();
                 gestureHint.style.display = 'block';
-                gestureHint.innerHTML = '✋ Kamera ditutup, gunakan mouse/touch untuk zoom';
+                gestureHint.innerHTML = '🖐️ <span class="highlight">Kamera ditutup</span><br>🤏 Pinch = Zoom | ✊ Tidak ada kepalan';
             });
             
             gestureHint.style.display = 'none';
@@ -826,88 +918,155 @@
         
         function onHandResults(results) {
             const gestureStatus = document.getElementById('gestureStatus');
+            const fingerInfo = document.getElementById('fingerInfo');
             if (!gestureStatus) return;
             
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const landmarks = results.multiHandLandmarks[0];
                 isHandDetected = true;
                 
-                // Hitung jarak antara ujung jari telunjuk dan ibu jari untuk zoom
-                const thumbTip = landmarks[4];
-                const indexTip = landmarks[8];
+                const finger = getFingerStatus(landmarks);
+                const fist = isFist(landmarks);
                 
-                const dx = thumbTip.x - indexTip.x;
-                const dy = thumbTip.y - indexTip.y;
-                const distance = Math.sqrt(dx*dx + dy*dy);
+                // Update info jari
+                let fingerText = '';
+                if (finger.indexOpen) fingerText += '☝️ Telunjuk terbuka ';
+                if (finger.middleOpen) fingerText += '🖕 Tengah terbuka ';
+                if (finger.ringOpen) fingerText += '💍 Manis terbuka ';
+                if (finger.pinkyOpen) fingerText += ' pinky ';
+                if (!finger.indexOpen && !finger.middleOpen && !finger.ringOpen && !finger.pinkyOpen) fingerText = '✊ Semua jari mengepal! ';
                 
-                // Zoom in/out berdasarkan jarak jari
-                if (lastDistance !== null) {
-                    const delta = distance - lastDistance;
-                    targetScale = Math.min(1.5, Math.max(0.8, currentScale + delta * 3));
+                // ========== DETEKSI KEPALAN ==========
+                if (fist && !lastFistState) {
+                    isFistDetected = true;
+                    fistStartTime = Date.now();
+                    gestureStatus.innerHTML = '✊ KEPALAN TERDETEKSI! Menyusutkan semua... ✊';
+                    fingerInfo.innerHTML = '💥 WHOOSH! Semua foto menyusut! 💥';
+                    
+                    const oldScale = targetScale;
+                    targetScale = Math.max(0.5, targetScale - 0.15);
+                    if (oldScale !== targetScale) {
+                        showFistInfo();
+                        createShrinkEffect();
+                    }
+                    
+                    fotoItems.forEach(item => {
+                        item.style.transform = 'scale(0.95)';
+                        setTimeout(() => { item.style.transform = ''; }, 300);
+                    });
+                    
+                } else if (!fist && lastFistState) {
+                    gestureStatus.innerHTML = '✋ Lepas kepalan';
+                    fingerInfo.innerHTML = fingerText || '✋ Tangan terbuka';
+                    isFistDetected = false;
+                    showGestureInfo('Lepas kepalan', '✋');
+                    
+                } else if (fist && lastFistState) {
+                    if (Date.now() - fistStartTime > 500) {
+                        const oldScale = targetScale;
+                        targetScale = Math.max(0.45, targetScale - 0.01);
+                        if (oldScale !== targetScale) {
+                            gestureStatus.innerHTML = `✊ Menyusut... ${Math.round(targetScale * 100)}%`;
+                        }
+                    }
                 }
-                lastDistance = distance;
                 
-                // Hitung posisi tangan untuk geser (rotate)
-                const palmCenter = landmarks[0]; // pergelangan tangan
-                const screenX = (palmCenter.x - 0.5) * 2; // -1 ke 1
-                const screenY = (palmCenter.y - 0.5) * 2;
+                lastFistState = fist;
                 
-                targetRotateX = screenY * 15;
-                targetRotateY = screenX * 15;
-                
-                gestureStatus.innerHTML = `✌️ Tangan terdeteksi! ${Math.round(targetScale * 100)}% | Geser: ${Math.round(targetRotateX)}°`;
-                gestureHint.innerHTML = '✨ Gerakkan tangan untuk zoom & putar foto! ✨';
+                // ========== ZOOM DENGAN JEPIT JARI (hanya jika tidak mengepal) ==========
+                if (!fist && !isFistDetected) {
+                    const thumbTip = landmarks[4];
+                    const indexTip = landmarks[8];
+                    const dx = thumbTip.x - indexTip.x;
+                    const dy = thumbTip.y - indexTip.y;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (lastDistance !== null) {
+                        const delta = distance - lastDistance;
+                        const oldScale = targetScale;
+                        const newScale = Math.min(1.8, Math.max(0.55, currentScale + delta * 5));
+                        
+                        if (Math.abs(newScale - oldScale) > 0.01) {
+                            targetScale = newScale;
+                            const percent = Math.round(targetScale * 100);
+                            const isZoomIn = delta < 0;
+                            
+                            if (Date.now() - lastZoomTime > 200) {
+                                showZoomInfo(percent, isZoomIn);
+                                lastZoomTime = Date.now();
+                            }
+                            
+                            gestureStatus.innerHTML = `🤏 Jepit jari: ${percent}% ${isZoomIn ? '🔍+' : '🔍-'}`;
+                            fingerInfo.innerHTML = `📏 Jarak jari: ${Math.round(distance * 100)}px | ${isZoomIn ? 'Zoom In' : 'Zoom Out'}`;
+                        } else {
+                            gestureStatus.innerHTML = `🤏 Jepit jari: ${Math.round(targetScale * 100)}%`;
+                        }
+                    }
+                    lastDistance = distance;
+                    
+                    // Hitung posisi tangan untuk geser (rotate)
+                    const palmCenter = landmarks[0];
+                    const screenX = (palmCenter.x - 0.5) * 2;
+                    const screenY = (palmCenter.y - 0.5) * 2;
+                    
+                    if (Math.abs(screenX) > 0.05 || Math.abs(screenY) > 0.05) {
+                        targetRotateX = screenY * 12;
+                        targetRotateY = screenX * 12;
+                        if (!fist) {
+                            fingerInfo.innerHTML += ` | 🖐️ Geser: X:${Math.round(screenX*100)}% Y:${Math.round(screenY*100)}%`;
+                        }
+                    }
+                    
+                } else if (!fist) {
+                    lastDistance = null;
+                    gestureStatus.innerHTML = '✋ Tangan terdeteksi - Jepit jari untuk zoom';
+                    fingerInfo.innerHTML = fingerText || '✋ Gerakkan tangan untuk memutar foto';
+                }
                 
             } else {
                 if (isHandDetected) {
                     isHandDetected = false;
                     lastDistance = null;
+                    lastFistState = false;
+                    isFistDetected = false;
                     gestureStatus.innerHTML = '👋 Tangan tidak terdeteksi';
-                    gestureHint.innerHTML = '✋ Tunjukkan telapak tangan ke kamera';
-                    
-                    // Reset perlahan
-                    targetScale = 1;
-                    targetRotateX = 0;
-                    targetRotateY = 0;
+                    fingerInfo.innerHTML = '✋ Tunjukkan tangan ke kamera';
                 }
             }
         }
         
-        // Smooth animation untuk zoom dan rotate
+        // Smooth animation
         function animateHandEffects() {
-            currentScale += (targetScale - currentScale) * 0.15;
-            currentRotateX += (targetRotateX - currentRotateX) * 0.15;
-            currentRotateY += (targetRotateY - currentRotateY) * 0.15;
+            currentScale += (targetScale - currentScale) * 0.12;
+            currentRotateX += (targetRotateX - currentRotateX) * 0.12;
+            currentRotateY += (targetRotateY - currentRotateY) * 0.12;
             
             if (card) {
                 card.style.transform = `perspective(1000px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${currentScale})`;
-                card.style.transformOrigin = 'center center';
             }
-            
-            if (fotoUtama) {
-                fotoUtama.style.transform = `scale(${1 + (currentScale - 1) * 0.5})`;
-            }
+            if (fotoUtama) fotoUtama.style.transform = `scale(${1 + (currentScale - 1) * 0.6})`;
+            if (confessionBox) confessionBox.style.transform = `scale(${1 + (currentScale - 1) * 0.3})`;
+            fotoGridImgs.forEach((img, idx) => {
+                img.style.transform = `scale(${1 + (currentScale - 1) * 0.4})`;
+            });
             
             requestAnimationFrame(animateHandEffects);
         }
         animateHandEffects();
         
-        // Fallback: Mouse/touch control jika kamera tidak aktif
-        let mouseX = 0, mouseY = 0;
+        // Fallback mouse/touch
         document.addEventListener('mousemove', (e) => {
             if (!mainContent.classList.contains('show')) return;
-            if (isHandDetected) return; // Prioritaskan hand tracking
-            
+            if (isHandDetected) return;
             const x = (e.clientX / window.innerWidth) - 0.5;
             const y = (e.clientY / window.innerHeight) - 0.5;
-            targetRotateX = y * 10;
-            targetRotateY = x * 10;
+            targetRotateX = y * 8;
+            targetRotateY = x * 8;
         });
         
-        // Touch zoom untuk HP (pinch)
         let initialTouchDistance = 0;
         document.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
+            if (e.touches.length === 2 && !isHandDetected) {
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 initialTouchDistance = Math.sqrt(dx*dx + dy*dy);
@@ -919,35 +1078,30 @@
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 const distance = Math.sqrt(dx*dx + dy*dy);
-                
                 if (initialTouchDistance > 0) {
                     const delta = distance - initialTouchDistance;
-                    targetScale = Math.min(1.5, Math.max(0.8, currentScale + delta * 0.01));
+                    targetScale = Math.min(1.6, Math.max(0.6, currentScale + delta * 0.008));
                 }
                 initialTouchDistance = distance;
-                
-                // Juga untuk rotate
                 const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 / window.innerWidth;
                 const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 / window.innerHeight;
-                targetRotateX = (centerY - 0.5) * 20;
-                targetRotateY = (centerX - 0.5) * 20;
+                targetRotateX = (centerY - 0.5) * 15;
+                targetRotateY = (centerX - 0.5) * 15;
             }
         });
         
         document.addEventListener('touchend', () => {
             initialTouchDistance = 0;
-            if (!isHandDetected) {
-                targetScale = 1;
-            }
+            if (!isHandDetected && !isFistDetected) targetScale = 1;
         });
         
-        // Global love effect
         document.body.addEventListener('click', (e) => {
             if (!introScreen.classList.contains('hide')) return;
             createLoveEffect(e.clientX, e.clientY);
         });
         
-        console.log("🎥 Hand Tracking Camera Ready! Tunjukkan tangan ke kamera untuk zoom & geser foto!");
+        console.log("🎥 Smart Hand Tracking Ready!");
+        console.log("📢 Fitur: Info jari real-time, hanya bergerak saat gerakan sesuai!");
     })();
 </script>
 </body>
