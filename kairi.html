@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>💌 a message for you</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>💌 Hand Tracking Magic - a message for you</title>
     <style>
         * {
             margin: 0;
@@ -104,11 +104,6 @@
             pointer-events: auto;
         }
 
-        .open-gift-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Efek love yang muncul saat klik */
         .click-love {
             position: fixed;
             pointer-events: none;
@@ -118,14 +113,8 @@
         }
 
         @keyframes floatLove {
-            0% {
-                transform: translateY(0) scale(0.5);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) scale(1.5);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
 
         .floating-particles {
@@ -178,6 +167,8 @@
         .main-content {
             opacity: 0;
             transition: opacity 0.5s ease;
+            position: relative;
+            z-index: 10;
         }
 
         .main-content.show {
@@ -192,6 +183,70 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Camera overlay */
+        .camera-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 12px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .camera-overlay video {
+            width: 80px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            transform: scaleX(-1);
+            background: #000;
+        }
+
+        .camera-overlay .info {
+            flex: 1;
+        }
+
+        .camera-overlay .gesture-status {
+            font-weight: bold;
+            color: #ff99bb;
+        }
+
+        .camera-overlay .close-cam {
+            background: #ff3366;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .gesture-hint {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 30px;
+            color: white;
+            font-size: 11px;
+            z-index: 100;
+            pointer-events: none;
+            font-family: monospace;
         }
 
         .card {
@@ -201,12 +256,15 @@
             border-radius: 48px;
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            transition: transform 0.1s ease-out, scale 0.1s ease-out;
+            transform-origin: center center;
         }
 
         .hero {
             position: relative;
             background: #2c1a1f;
             text-align: center;
+            overflow: hidden;
         }
 
         .foto-berdua {
@@ -216,6 +274,7 @@
             object-fit: cover;
             display: block;
             border-bottom: 4px solid #ff7b9c;
+            transition: transform 0.1s ease-out;
         }
 
         .music-player {
@@ -338,7 +397,7 @@
         .foto-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 15px;
             margin: 20px 0 10px;
         }
 
@@ -346,6 +405,8 @@
             background: #ffeef3;
             padding: 8px;
             border-radius: 28px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .foto-grid-img {
@@ -365,19 +426,51 @@
             background: #fffafc;
         }
 
-        /* Loading indicator */
-        .loading-indicator {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #ff4d6d;
-            font-size: 0.9rem;
+        @keyframes floatGrid {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .foto-item {
+            animation: floatGrid 4s ease-in-out infinite;
+        }
+        .foto-item:nth-child(1) { animation-delay: 0s; }
+        .foto-item:nth-child(2) { animation-delay: 0.5s; }
+        .foto-item:nth-child(3) { animation-delay: 1s; }
+        .foto-item:nth-child(4) { animation-delay: 1.5s; }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #ff99bb;
+            border-top-color: #ff3366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-<!-- HALAMAN PEMBUKA -->
 <div class="intro-screen" id="introScreen">
     <div class="floating-particles" id="particlesContainer"></div>
     <div class="intro-content">
@@ -386,9 +479,7 @@
                 <path d="M50 88.5C50 88.5 10 55 10 30C10 15 20 5 35 5C45 5 50 12 50 12C50 12 55 5 65 5C80 5 90 15 90 30C90 55 50 88.5 50 88.5Z" stroke="#ff99bb" stroke-width="2"/>
             </svg>
         </div>
-        
         <div class="waiting-text" id="waitingText">✨ klik di mana saja untuk mulai ✨</div>
-        
         <div class="gift-box" id="giftBox">
             <div class="special-gift-text">A SPECIAL GIFT FOR YOU</div>
             <button class="open-gift-btn" id="openGiftBtn">🎁 Open Gift for me</button>
@@ -396,9 +487,8 @@
     </div>
 </div>
 
-<!-- HALAMAN UTAMA -->
 <div class="main-content" id="mainContent">
-    <div class="card">
+    <div class="card" id="mainCard">
         <div class="hero">
             <img class="foto-berdua" id="fotoUtama" src="https://img2.pixhost.to/images/7162/714785581_alip-1776132126365.jpg" alt="foto kenangan" onerror="this.src='https://placehold.co/600x600/FFB6C1/white?text=Foto+Berdua'">
         </div>
@@ -407,13 +497,12 @@
             <div class="music-controls">
                 <img class="music-thumbnail" id="musicThumb" src="https://img2.pixhost.to/images/7162/714785756_alip-1776132262897.jpg" alt="thumbnail" onerror="this.src='https://placehold.co/50x50/FFB6C1/white?text=🎵'">
                 <div class="music-info">
-                    <div class="music-title" id="songTitle">🎵 Lagu 1</div>
-                    <div class="music-status" id="musicStatus">🎶 memuat lagu...</div>
+                    <div class="music-title" id="songTitle">🎵 Lagu Spesial 1</div>
+                    <div class="music-status" id="musicStatus">🎶 Klik Play untuk mulai</div>
                 </div>
-                <button class="music-play-btn" id="musicToggleBtn">⏸️</button>
+                <button class="music-play-btn" id="musicToggleBtn">▶️</button>
                 <button class="switch-song-btn" id="switchSongBtn">🔄 Ganti Lagu</button>
             </div>
-            
             <div class="progress-container">
                 <span class="current-time" id="currentTime">0:00</span>
                 <div class="progress-bar-bg" id="progressBarBg">
@@ -437,19 +526,18 @@
                 <div class="foto-item"><img class="foto-grid-img" src="https://img2.pixhost.to/images/7162/714785756_alip-1776132262897.jpg" alt="" onerror="this.src='https://placehold.co/200x200/FF9EBB/white?text=📸'"></div>
             </div>
         </div>
-
         <footer>💌 from me, to you — with all my heart</footer>
     </div>
 </div>
 
-<!-- LAGU PEMBUKA (intro) -->
-<audio id="introLagu" preload="auto">
-    <source src="https://h.uguu.se/srSPyCbS.mp3" type="audio/mpeg">
-</audio>
+<div class="gesture-hint" id="gestureHint">✋ Tunjukkan telapak tangan ke kamera</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 <script>
     (function() {
-        // ========== EFEK LOVE SAAT KLIK ==========
+        // ========== EFEK LOVE ==========
         function createLoveEffect(x, y) {
             const love = document.createElement('div');
             love.innerHTML = '❤️';
@@ -464,44 +552,29 @@
             setTimeout(() => love.remove(), 1000);
         }
 
-        // ========== HALAMAN PEMBUKA ==========
+        // ========== LAGU ==========
+        const INTRO_SONG_URL = "https://h.top4top.io/m_3756oaons1.mp3";
+        const LAGU_LIST = [
+            { url: "https://l.top4top.io/m_3756cgskf1.mp3", name: "🎵 Lagu Spesial 1" },
+            { url: "https://d.uguu.se/rAurKylF.mp3", name: "🎵 Lagu Spesial 2" },
+            { url: "https://e.top4top.io/m_3756l69fo1.mp3", name: "🎵 Lagu Spesial 3" }
+        ];
+        
+        let currentSongIndex = 0;
+        let introFinished = false;
+        let audioStarted = false;
+        
+        // ========== INTRO ==========
         const introScreen = document.getElementById('introScreen');
         const mainContent = document.getElementById('mainContent');
         const openBtn = document.getElementById('openGiftBtn');
         const giftBox = document.getElementById('giftBox');
         const waitingText = document.getElementById('waitingText');
-        const introAudio = document.getElementById('introLagu');
         
-        let introFinished = false;
-        let audioStarted = false;
+        const introAudio = new Audio();
+        introAudio.src = INTRO_SONG_URL;
+        introAudio.volume = 0.5;
         
-        // Fungsi mulai lagu intro + efek love
-        function startIntroAudio(event) {
-            if (!audioStarted) {
-                audioStarted = true;
-                introAudio.play().then(() => {
-                    console.log("Lagu intro berjalan");
-                }).catch(e => {
-                    console.log("Error play intro:", e);
-                    // Fallback: tetap lanjut walau error
-                });
-            }
-            // Efek love di posisi klik
-            if (event && event.clientX) {
-                createLoveEffect(event.clientX, event.clientY);
-            }
-        }
-        
-        // Saat klik di mana saja di intro screen
-        introScreen.addEventListener('click', (e) => {
-            // Jangan trigger jika yang diklik adalah tombol open gift
-            if (e.target === openBtn || openBtn.contains(e.target)) {
-                return;
-            }
-            startIntroAudio(e);
-        });
-        
-        // Saat lagu intro selesai
         introAudio.addEventListener('ended', () => {
             if (!introFinished) {
                 introFinished = true;
@@ -510,7 +583,6 @@
             }
         });
         
-        // Jika lagu gagal load, tetap munculin tombol setelah beberapa detik
         introAudio.addEventListener('error', () => {
             setTimeout(() => {
                 if (!introFinished) {
@@ -518,27 +590,48 @@
                     waitingText.style.display = 'none';
                     giftBox.style.display = 'block';
                 }
-            }, 3000);
+            }, 2000);
         });
         
-        // Tombol Open Gift
+        function startIntroAudio(event) {
+            if (!audioStarted) {
+                audioStarted = true;
+                introAudio.play().catch(e => console.log("Play intro error:", e));
+                if (event && event.clientX) createLoveEffect(event.clientX, event.clientY);
+            } else {
+                if (event && event.clientX) createLoveEffect(event.clientX, event.clientY);
+            }
+        }
+        
+        introScreen.addEventListener('click', (e) => {
+            if (e.target === openBtn || openBtn.contains(e.target)) return;
+            startIntroAudio(e);
+        });
+        
+        setTimeout(() => {
+            if (!introFinished) {
+                introFinished = true;
+                waitingText.style.display = 'none';
+                giftBox.style.display = 'block';
+            }
+        }, 10000);
+        
         openBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             introScreen.classList.add('hide');
             mainContent.classList.add('show');
             introAudio.pause();
+            if (mainAudio) mainAudio.play().catch(e => console.log("Auto-play need interaction"));
+            if (e.clientX) createLoveEffect(e.clientX, e.clientY);
             
-            // Jalankan lagu utama
-            if (mainAudio) {
-                mainAudio.play().catch(e => console.log("autoplay perlu interaksi", e));
-            }
+            // Mulai kamera setelah user klik
+            startCamera();
         });
         
-        // Hati melayang di background
         function createFloatingHearts() {
             const container = document.getElementById('particlesContainer');
             if (!container) return;
-            for (let i = 0; i < 35; i++) {
+            for (let i = 0; i < 25; i++) {
                 const heartDiv = document.createElement('div');
                 heartDiv.classList.add('particle-heart');
                 heartDiv.style.left = Math.random() * 100 + '%';
@@ -546,26 +639,16 @@
                 heartDiv.style.animationDelay = Math.random() * 5 + 's';
                 heartDiv.style.width = 16 + Math.random() * 26 + 'px';
                 heartDiv.style.height = heartDiv.style.width;
-                heartDiv.innerHTML = `<svg viewBox="0 0 100 100" fill="none">
-                                        <path d="M50 88.5C50 88.5 10 55 10 30C10 15 20 5 35 5C45 5 50 12 50 12C50 12 55 5 65 5C80 5 90 15 90 30C90 55 50 88.5 50 88.5Z" fill="#ff4d6d" stroke="#ff99bb" stroke-width="1"/>
-                                      </svg>`;
+                heartDiv.innerHTML = `<svg viewBox="0 0 100 100"><path d="M50 88.5C50 88.5 10 55 10 30C10 15 20 5 35 5C45 5 50 12 50 12C50 12 55 5 65 5C80 5 90 15 90 30C90 55 50 88.5 50 88.5Z" fill="#ff4d6d"/></svg>`;
                 container.appendChild(heartDiv);
             }
         }
         createFloatingHearts();
         
-        // ========== HALAMAN UTAMA (2 LAGU + PROGRESS BAR) ==========
-        const LAGU_LIST = [
-            { url: "https://h.uguu.se/HDnawZwP.mp3", name: "🎵 Lagu 1" },
-            { url: "https://o.uguu.se/hXEYzJLB.mp3", name: "🎵 Lagu 2" }
-        ];
-        let currentSongIndex = 0;
-        
-        // Buat audio element untuk halaman utama
+        // ========== AUDIO PLAYER ==========
         const mainAudio = new Audio();
-        mainAudio.id = 'laguUtama';
         mainAudio.loop = true;
-        mainAudio.preload = 'auto';
+        mainAudio.volume = 0.6;
         
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const musicStatusSpan = document.getElementById('musicStatus');
@@ -580,14 +663,14 @@
         let isDragging = false;
         
         function formatTime(seconds) {
-            if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
+            if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return "0:00";
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
         
         function updateProgress() {
-            if (!isDragging && mainAudio.duration && !isNaN(mainAudio.duration) && mainAudio.duration > 0) {
+            if (!isDragging && mainAudio.duration && mainAudio.duration > 0) {
                 const percent = (mainAudio.currentTime / mainAudio.duration) * 100;
                 progressBarFill.style.width = percent + '%';
                 currentTimeSpan.innerText = formatTime(mainAudio.currentTime);
@@ -595,91 +678,55 @@
         }
         
         function setTotalDuration() {
-            if (mainAudio.duration && !isNaN(mainAudio.duration) && mainAudio.duration > 0) {
+            if (mainAudio.duration && mainAudio.duration > 0) {
                 totalTimeSpan.innerText = formatTime(mainAudio.duration);
-                musicStatusSpan.innerHTML = '🎶 lagu siap';
-            } else {
-                totalTimeSpan.innerText = "0:00";
             }
         }
         
         function seekTo(e) {
             const rect = progressBarBg.getBoundingClientRect();
-            let clickX = e.clientX - rect.left;
-            let width = rect.width;
-            let percent = Math.min(1, Math.max(0, clickX / width));
-            if (mainAudio.duration && !isNaN(mainAudio.duration)) {
-                mainAudio.currentTime = percent * mainAudio.duration;
-                updateProgress();
-            }
+            let percent = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+            if (mainAudio.duration) mainAudio.currentTime = percent * mainAudio.duration;
         }
         
-        // Event progress bar
         if (progressBarBg) {
             progressBarBg.addEventListener('click', seekTo);
-            progressBarBg.addEventListener('mousedown', (e) => { isDragging = true; seekTo(e); });
-            document.addEventListener('mouseup', () => { isDragging = false; });
+            progressBarBg.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
             document.addEventListener('mousemove', (e) => { if (isDragging) seekTo(e); });
         }
         
         setInterval(() => { if (!isDragging && mainAudio && !mainAudio.paused) updateProgress(); }, 200);
         mainAudio.addEventListener('loadedmetadata', setTotalDuration);
         mainAudio.addEventListener('timeupdate', updateProgress);
-        mainAudio.addEventListener('canplay', () => {
-            musicStatusSpan.innerHTML = '🎶 lagu diputar';
-        });
         
-        function changeSong(index) {
-            currentSongIndex = index;
-            const wasPlaying = !mainAudio.paused;
-            musicStatusSpan.innerHTML = '🎶 memuat lagu...';
-            mainAudio.src = LAGU_LIST[currentSongIndex].url;
-            songTitleSpan.innerText = LAGU_LIST[currentSongIndex].name;
+        function loadSong(index) {
+            musicStatusSpan.innerHTML = '🎵 Memuat lagu...';
+            songTitleSpan.innerText = LAGU_LIST[index].name;
+            mainAudio.src = LAGU_LIST[index].url;
             mainAudio.load();
             progressBarFill.style.width = '0%';
             currentTimeSpan.innerText = "0:00";
             totalTimeSpan.innerText = "0:00";
             
-            mainAudio.addEventListener('loadedmetadata', setTotalDuration, { once: true });
             mainAudio.addEventListener('canplay', () => {
-                if (wasPlaying || isPlayingMain) {
-                    mainAudio.play().then(() => {
-                        isPlayingMain = true;
-                        updateMusicUI();
-                    }).catch((err) => {
-                        console.log("Play error:", err);
-                        isPlayingMain = false;
-                        updateMusicUI();
-                    });
-                }
+                musicStatusSpan.innerHTML = '🎵 Lagu siap';
+                if (isPlayingMain) mainAudio.play().catch(() => {});
             }, { once: true });
-            
-            if (!wasPlaying && !isPlayingMain) {
-                isPlayingMain = false;
-                updateMusicUI();
-            }
         }
         
         function updateMusicUI() {
             if (isPlayingMain && !mainAudio.paused) {
                 musicToggleBtn.innerHTML = '⏸️';
-                musicStatusSpan.innerHTML = '🎶 lagu diputar';
-                musicStatusSpan.style.color = '#e6395e';
+                musicStatusSpan.innerHTML = '🎵 Lagu diputar';
             } else {
                 musicToggleBtn.innerHTML = '▶️';
-                musicStatusSpan.innerHTML = '🔇 lagu dijeda';
-                musicStatusSpan.style.color = '#d97a9a';
+                musicStatusSpan.innerHTML = '🎵 Klik Play';
             }
         }
         
         function playMusic() {
-            mainAudio.play().then(() => {
-                isPlayingMain = true;
-                updateMusicUI();
-            }).catch((err) => {
-                console.log("Play error:", err);
-                musicStatusSpan.innerHTML = '⚠️ klik lagi untuk play';
-            });
+            mainAudio.play().then(() => { isPlayingMain = true; updateMusicUI(); }).catch(() => {});
         }
         
         function pauseMusic() {
@@ -688,39 +735,219 @@
             updateMusicUI();
         }
         
-        if (musicToggleBtn) {
-            musicToggleBtn.addEventListener('click', () => {
-                if (!mainAudio.paused) pauseMusic();
-                else playMusic();
-            });
-        }
-        
-        if (switchSongBtn) {
-            switchSongBtn.addEventListener('click', () => {
-                changeSong((currentSongIndex + 1) % LAGU_LIST.length);
-            });
-        }
-        
-        mainAudio.addEventListener('play', () => {
-            isPlayingMain = true;
-            updateMusicUI();
+        musicToggleBtn.addEventListener('click', () => {
+            if (mainAudio.paused || !isPlayingMain) playMusic();
+            else pauseMusic();
         });
-        mainAudio.addEventListener('pause', () => {
+        
+        switchSongBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % LAGU_LIST.length;
+            const wasPlaying = isPlayingMain;
             isPlayingMain = false;
-            updateMusicUI();
-        });
-        mainAudio.addEventListener('error', (e) => {
-            console.log("Audio error:", e);
-            musicStatusSpan.innerHTML = '⚠️ error lagu, coba ganti lagu';
+            loadSong(currentSongIndex);
+            if (wasPlaying) setTimeout(() => playMusic(), 100);
         });
         
-        // Set lagu awal
-        mainAudio.src = LAGU_LIST[0].url;
-        songTitleSpan.innerText = LAGU_LIST[0].name;
-        mainAudio.load();
+        loadSong(0);
         
-        // Fallback untuk foto yang gagal load
-        console.log("Website siap!");
+        // ========== HAND TRACKING & ZOOM ==========
+        const card = document.getElementById('mainCard');
+        const fotoUtama = document.getElementById('fotoUtama');
+        let currentScale = 1;
+        let currentRotateX = 0;
+        let currentRotateY = 0;
+        let targetScale = 1;
+        let targetRotateX = 0;
+        let targetRotateY = 0;
+        
+        // Variabel untuk hand tracking
+        let lastHandPosition = null;
+        let lastDistance = null;
+        let isHandDetected = false;
+        let gestureHint = document.getElementById('gestureHint');
+        
+        // Camera overlay elements
+        let videoElement = null;
+        let camera = null;
+        let hands = null;
+        
+        function startCamera() {
+            // Buat overlay kamera
+            const overlay = document.createElement('div');
+            overlay.className = 'camera-overlay';
+            overlay.id = 'cameraOverlay';
+            overlay.innerHTML = `
+                <video id="handVideo" autoplay muted playsinline></video>
+                <div class="info">
+                    <div>🖐️ Hand Tracking Active</div>
+                    <div class="gesture-status" id="gestureStatus">Menunggu tangan...</div>
+                </div>
+                <button class="close-cam" id="closeCamBtn">✖ Tutup</button>
+            `;
+            document.body.appendChild(overlay);
+            
+            videoElement = document.getElementById('handVideo');
+            
+            // Inisialisasi MediaPipe Hands
+            hands = new Hands({
+                locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+                }
+            });
+            
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+            
+            hands.onResults(onHandResults);
+            
+            // Mulai camera
+            const cameraObj = new Camera(videoElement, {
+                onFrame: async () => {
+                    await hands.send({image: videoElement});
+                },
+                width: 320,
+                height: 240
+            });
+            cameraObj.start();
+            
+            document.getElementById('closeCamBtn').addEventListener('click', () => {
+                cameraObj.stop();
+                overlay.remove();
+                gestureHint.style.display = 'block';
+                gestureHint.innerHTML = '✋ Kamera ditutup, gunakan mouse/touch untuk zoom';
+            });
+            
+            gestureHint.style.display = 'none';
+        }
+        
+        function onHandResults(results) {
+            const gestureStatus = document.getElementById('gestureStatus');
+            if (!gestureStatus) return;
+            
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                isHandDetected = true;
+                
+                // Hitung jarak antara ujung jari telunjuk dan ibu jari untuk zoom
+                const thumbTip = landmarks[4];
+                const indexTip = landmarks[8];
+                
+                const dx = thumbTip.x - indexTip.x;
+                const dy = thumbTip.y - indexTip.y;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                
+                // Zoom in/out berdasarkan jarak jari
+                if (lastDistance !== null) {
+                    const delta = distance - lastDistance;
+                    targetScale = Math.min(1.5, Math.max(0.8, currentScale + delta * 3));
+                }
+                lastDistance = distance;
+                
+                // Hitung posisi tangan untuk geser (rotate)
+                const palmCenter = landmarks[0]; // pergelangan tangan
+                const screenX = (palmCenter.x - 0.5) * 2; // -1 ke 1
+                const screenY = (palmCenter.y - 0.5) * 2;
+                
+                targetRotateX = screenY * 15;
+                targetRotateY = screenX * 15;
+                
+                gestureStatus.innerHTML = `✌️ Tangan terdeteksi! ${Math.round(targetScale * 100)}% | Geser: ${Math.round(targetRotateX)}°`;
+                gestureHint.innerHTML = '✨ Gerakkan tangan untuk zoom & putar foto! ✨';
+                
+            } else {
+                if (isHandDetected) {
+                    isHandDetected = false;
+                    lastDistance = null;
+                    gestureStatus.innerHTML = '👋 Tangan tidak terdeteksi';
+                    gestureHint.innerHTML = '✋ Tunjukkan telapak tangan ke kamera';
+                    
+                    // Reset perlahan
+                    targetScale = 1;
+                    targetRotateX = 0;
+                    targetRotateY = 0;
+                }
+            }
+        }
+        
+        // Smooth animation untuk zoom dan rotate
+        function animateHandEffects() {
+            currentScale += (targetScale - currentScale) * 0.15;
+            currentRotateX += (targetRotateX - currentRotateX) * 0.15;
+            currentRotateY += (targetRotateY - currentRotateY) * 0.15;
+            
+            if (card) {
+                card.style.transform = `perspective(1000px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${currentScale})`;
+                card.style.transformOrigin = 'center center';
+            }
+            
+            if (fotoUtama) {
+                fotoUtama.style.transform = `scale(${1 + (currentScale - 1) * 0.5})`;
+            }
+            
+            requestAnimationFrame(animateHandEffects);
+        }
+        animateHandEffects();
+        
+        // Fallback: Mouse/touch control jika kamera tidak aktif
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            if (!mainContent.classList.contains('show')) return;
+            if (isHandDetected) return; // Prioritaskan hand tracking
+            
+            const x = (e.clientX / window.innerWidth) - 0.5;
+            const y = (e.clientY / window.innerHeight) - 0.5;
+            targetRotateX = y * 10;
+            targetRotateY = x * 10;
+        });
+        
+        // Touch zoom untuk HP (pinch)
+        let initialTouchDistance = 0;
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                initialTouchDistance = Math.sqrt(dx*dx + dy*dy);
+            }
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isHandDetected && e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                
+                if (initialTouchDistance > 0) {
+                    const delta = distance - initialTouchDistance;
+                    targetScale = Math.min(1.5, Math.max(0.8, currentScale + delta * 0.01));
+                }
+                initialTouchDistance = distance;
+                
+                // Juga untuk rotate
+                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 / window.innerWidth;
+                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 / window.innerHeight;
+                targetRotateX = (centerY - 0.5) * 20;
+                targetRotateY = (centerX - 0.5) * 20;
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            initialTouchDistance = 0;
+            if (!isHandDetected) {
+                targetScale = 1;
+            }
+        });
+        
+        // Global love effect
+        document.body.addEventListener('click', (e) => {
+            if (!introScreen.classList.contains('hide')) return;
+            createLoveEffect(e.clientX, e.clientY);
+        });
+        
+        console.log("🎥 Hand Tracking Camera Ready! Tunjukkan tangan ke kamera untuk zoom & geser foto!");
     })();
 </script>
 </body>
