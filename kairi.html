@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>💝 Special Gift for You - Untuk Kamu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* HALAMAN PEMBUKA */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #1a0b0f 0%, #2d1a22 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .intro-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .intro-content {
+            text-align: center;
+            padding: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .floating-heart-logo {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 30px;
+            animation: floatHeart 2.5s ease-in-out infinite;
+        }
+
+        .heart-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 15px rgba(255, 80, 120, 0.6));
+        }
+
+        .heart-svg path {
+            fill: #ff3366;
+            stroke: #ff99bb;
+            stroke-width: 1.5;
+            animation: pulseGlow 1.8s ease-in-out infinite;
+        }
+
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle-heart {
+            position: absolute;
+            bottom: -50px;
+            width: 20px;
+            height: 20px;
+            animation: floatUp 6s linear infinite;
+            opacity: 0.6;
+        }
+
+        .particle-heart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes floatHeart {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { filter: drop-shadow(0 0 5px #ff3366); }
+            50% { filter: drop-shadow(0 0 25px #ff6699); }
+            100% { filter: drop-shadow(0 0 5px #ff3366); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .special-gift-text {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffccdd, #ff99bb, #ff6699);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 40px;
+        }
+
+        .open-gift-btn {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            border: none;
+            padding: 16px 42px;
+            border-radius: 60px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
+        }
+
+        .open-gift-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #ff5580, #e6004c);
+        }
+
+        /* HALAMAN UTAMA */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .main-content.show {
+            opacity: 1;
+        }
+
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #ffe6f0 0%, #ffccdd 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .hero {
+            position: relative;
+            background: #2c1a1f;
+            text-align: center;
+        }
+
+        .foto-berdua {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            border-bottom: 4px solid #ff7b9c;
+        }
+
+        /* MUSIC PLAYER DI BAWAH FOTO */
+        .music-player {
+            background: linear-gradient(135deg, #fff0f3, #ffe4ec);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #ffd0dd;
+        }
+
+        .music-thumbnail {
+            width: 55px;
+            height: 55px;
+            border-radius: 30px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .music-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .music-info {
+            flex: 1;
+        }
+
+        .music-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #b83b5e;
+        }
+
+        .music-status {
+            font-size: 0.7rem;
+            color: #d97a9a;
+        }
+
+        .music-play-btn {
+            background: #ff4d6d;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 77, 109, 0.4);
+        }
+
+        .music-play-btn:hover {
+            background: #e6395e;
+            transform: scale(1.05);
+        }
+
+        .content {
+            padding: 28px 24px 32px;
+        }
+
+        .title {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d43f6b, #b2224a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .sub {
+            color: #b15573;
+            font-weight: 500;
+            margin-bottom: 24px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .surat-area {
+            background: #fff9f5;
+            border-radius: 32px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ffe2e9;
+        }
+
+        .surat-teks {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #2e2c2a;
+            background: #fff1ea;
+            padding: 20px;
+            border-radius: 24px;
+            white-space: pre-line;
+            text-align: center;
+            font-style: normal;
+        }
+
+        /* GRID FOTO - TANPA TEKS/CAPTION */
+        .foto-aib {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin: 20px 0;
+        }
+
+        .aib-item {
+            background: #ffeef3;
+            padding: 10px;
+            border-radius: 28px;
+        }
+
+        .aib-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 24px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        /* HAPUS SEMUA TEKS/CAPTION - tidak ada .aib-caption */
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 18px;
+            color: #ad6f83;
+            border-top: 1px solid #ffd9e3;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HALAMAN PEMBUKA -->
+<div class="intro-screen" id="introScreen">
+    <div class="floating-particles" id="particlesContainer"></div>
+    <div class="intro-content">
+        <div class="floating-heart-logo">
+            <svg class="heart-svg" viewBox="0 0 100 100" fill="none">
+                <path d="M50 88.5C50 88.5 10 55 10 30C10 15 20 5 35 5C45 5 50 12 50 12C50 12 55 5 65 5C80 5 90 15 90 30C90 55 50 88.5 50 88.5Z" stroke="#ff99bb" stroke-width="2"/>
+            </svg>
+        </div>
+        <div class="special-gift-text">A SPECIAL GIFT FOR YOU</div>
+        <button class="open-gift-btn" id="openGiftBtn">🎁 Open Gift for me</button>
+    </div>
+</div>
+
+<!-- HALAMAN UTAMA -->
+<div class="main-content" id="mainContent">
+    <div class="card">
+        <div class="hero">
+            <!-- FOTO UTAMA -->
+            <img class="foto-berdua" id="fotoUtama" src="https://img2.pixhost.to/images/7162/714785581_alip-1776132126365.jpg" alt="foto kenangan">
+        </div>
+
+        <!-- MUSIC PLAYER -->
+        <div class="music-player">
+            <img class="music-thumbnail" id="musicThumb" src="https://img2.pixhost.to/images/7162/714785756_alip-1776132262897.jpg" alt="thumbnail musik">
+            <div class="music-info">
+                <div class="music-title">🎵 Lagu Spesial Untukmu</div>
+                <div class="music-status" id="musicStatus">🎶 Memutar lagu...</div>
+            </div>
+            <button class="music-play-btn" id="musicToggleBtn">⏸️</button>
+        </div>
+
+        <div class="content">
+            <h1 class="title">✨ Untuk Kamu, Yang Teristimewa ✨</h1>
+            <div class="sub">💕 sepenggal rasa dari hati 💕</div>
+
+            <!-- SURAT CINTA ROMANCE (BUKAN ULTAH) -->
+            <div class="surat-area">
+                <div class="surat-teks" id="suratCinta">
+                    🌹 Untukmu, satu-satunya.. 🌹<br><br>
+                    Aku tidak tahu persis kapan jatuh cinta padamu.<br>
+                    Mungkin saat pertama kali melihat senyummu,<br>
+                    atau saat tanpa sengaja kau menggenggam tanganku.<br><br>
+                    Yang aku tahu, sejak saat itu,<br>
+                    dunianya jadi lebih berwarna.<br>
+                    Setiap hari bersamamu terasa seperti mimpi indah.<br><br>
+                    Kamu adalah alasan aku percaya pada takdir.<br>
+                    Bahwa di antara miliaran manusia di dunia ini,<br>
+                    aku dipertemukan dengan kamu.<br><br>
+                    Aku tidak janji akan sempurna,<br>
+                    tapi aku janji akan selalu berusaha untuk kamu.<br>
+                    Setiap hari, setiap waktu, hingga akhir nanti.<br><br>
+                    I Love You. ❤️<br>
+                    — Dari aku, untuk kamu.
+                </div>
+            </div>
+
+            <!-- GALERI FOTO - TANPA TEKS/CAPTION SAMA SEKALI -->
+            <div class="foto-aib" id="fotoAibContainer">
+                <div class="aib-item">
+                    <img class="aib-img" src="https://img2.pixhost.to/images/7162/714785661_alip-1776132191251.jpg" alt="foto 2">
+                </div>
+                <div class="aib-item">
+                    <img class="aib-img" src="https://img2.pixhost.to/images/7162/714785681_alip-1776132212076.jpg" alt="foto 3">
+                </div>
+                <div class="aib-item">
+                    <img class="aib-img" src="https://img2.pixhost.to/images/7162/714785704_alip-1776132224026.jpg" alt="foto 4">
+                </div>
+                <div class="aib-item">
+                    <img class="aib-img" src="https://img2.pixhost.to/images/7162/714785756_alip-1776132262897.jpg" alt="foto 5">
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            🌸 untuk kamu yang paling spesial di hati 🌸
+        </footer>
+    </div>
+</div>
+
+<!-- AUDIO AUTOPLAY -->
+<audio id="laguKenangan" loop autoplay preload="auto">
+    <source src="https://o.uguu.se/uDYvglRy.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    (function() {
+        // HATI MELAYANG DI HALAMAN PEMBUKA
+        function createFloatingHearts() {
+            const container = document.getElementById('particlesContainer');
+            if (!container) return;
+            for (let i = 0; i < 30; i++) {
+                const heartDiv = document.createElement('div');
+                heartDiv.classList.add('particle-heart');
+                heartDiv.style.left = Math.random() * 100 + '%';
+                heartDiv.style.animationDuration = 4 + Math.random() * 5 + 's';
+                heartDiv.style.animationDelay = Math.random() * 5 + 's';
+                heartDiv.style.width = 18 + Math.random() * 24 + 'px';
+                heartDiv.style.height = heartDiv.style.width;
+                heartDiv.innerHTML = `<svg viewBox="0 0 100 100" fill="none">
+                                        <path d="M50 88.5C50 88.5 10 55 10 30C10 15 20 5 35 5C45 5 50 12 50 12C50 12 55 5 65 5C80 5 90 15 90 30C90 55 50 88.5 50 88.5Z" fill="#ff4d6d" stroke="#ff99bb" stroke-width="1"/>
+                                      </svg>`;
+                container.appendChild(heartDiv);
+            }
+        }
+        createFloatingHearts();
+        
+        // TRANSISI KE HALAMAN UTAMA
+        const introScreen = document.getElementById('introScreen');
+        const mainContent = document.getElementById('mainContent');
+        const openBtn = document.getElementById('openGiftBtn');
+        
+        openBtn.addEventListener('click', () => {
+            introScreen.classList.add('hide');
+            mainContent.classList.add('show');
+            
+            // Coba play lagu (karena autoplay kadang diblokir browser, ini memastikan)
+            const audio = document.getElementById('laguKenangan');
+            audio.play().catch(e => console.log("Autoplay perlu interaksi, sudah dicoba"));
+        });
+        
+        // ========== MUSIK dengan thumbnail foto cewe ==========
+        const audio = document.getElementById('laguKenangan');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        const musicStatusSpan = document.getElementById('musicStatus');
+        let isPlaying = true; // autoplay true
+        
+        function updateMusicUI() {
+            if (isPlaying) {
+                musicToggleBtn.innerHTML = '⏸️';
+                musicStatusSpan.innerHTML = '🎶 Lagu sedang diputar';
+                musicStatusSpan.style.color = '#e6395e';
+            } else {
+                musicToggleBtn.innerHTML = '▶️';
+                musicStatusSpan.innerHTML = '🔇 Lagu dijeda';
+                musicStatusSpan.style.color = '#d97a9a';
+            }
+        }
+        
+        function playMusic() {
+            audio.play().then(() => {
+                isPlaying = true;
+                updateMusicUI();
+            }).catch(err => {
+                console.log("Gagal play");
+                isPlaying = false;
+                updateMusicUI();
+            });
+        }
+        
+        function pauseMusic() {
+            audio.pause();
+            isPlaying = false;
+            updateMusicUI();
+        }
+        
+        musicToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        });
+        
+        // Update UI jika autoplay berhasil atau gagal
+        audio.addEventListener('play', () => {
+            isPlaying = true;
+            updateMusicUI();
+        });
+        
+        audio.addEventListener('pause', () => {
+            isPlaying = false;
+            updateMusicUI();
+        });
+        
+        // Cek status awal
+        setTimeout(() => {
+            if (!audio.paused) {
+                isPlaying = true;
+                updateMusicUI();
+            } else {
+                // Jika autoplay diblokir, coba play setelah user klik tombol open
+                const tryPlay = () => {
+                    audio.play().catch(() => {});
+                };
+                openBtn.addEventListener('click', tryPlay, { once: true });
+            }
+        }, 100);
+    })();
+</script>
+</body>
+</html>
